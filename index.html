@@ -46,7 +46,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
 .status{color:var(--muted);font-size:14px;min-height:1.4em}
 form{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:14px;min-width:0}
-fieldset{border:0;padding:0;margin:0;display:grid;gap:12px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:12px;min-width:0}
 legend{font:700 13px/1 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
 label{display:grid;gap:5px;font:600 13px/1.2 var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 input,select,textarea{font:500 15px/1.3 var(--body);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:9px 10px;width:100%;min-width:0}
@@ -177,6 +177,71 @@ a.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .join p{margin:0;font:600 18px/1.3 var(--label);text-transform:uppercase;letter-spacing:.04em}
 footer.site{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
 @media (max-width:520px){.stats{grid-template-columns:minmax(0,1fr)}.tabs button{padding:10px 10px}}
+/* ---------- motion ----------
+   Everything below is scoped to html.anim, which the script only adds when the
+   viewer hasn't asked for reduced motion, so the page is complete without it. */
+:root{--ease:cubic-bezier(.2,.8,.2,1)}
+html.anim,html.anim body{overflow-x:clip}
+.tabs{position:relative}
+.tabs .ink{position:absolute;left:0;bottom:-1px;height:3px;width:0;background:var(--accent);border-radius:2px 2px 0 0;pointer-events:none}
+.anim .tabs .ink{transition:transform .45s var(--ease),width .45s var(--ease)}
+.anim .tabs button[aria-selected="true"]{border-bottom-color:transparent}
+.tabs button{transition:color .2s}
+.tabs button:hover{color:var(--fg)}
+.hero-in{position:relative;z-index:1}
+/* scroll / page reveal */
+.anim .rv{opacity:0;translate:0 26px;
+  transition:opacity .7s var(--ease) var(--d,0ms),translate .7s var(--ease) var(--d,0ms),transform .25s var(--ease),box-shadow .25s,border-color .25s}
+.anim .rv.in{opacity:1;translate:0 0}
+.anim .rv.pop{translate:none;scale:.86}
+.anim .rv.pop.in{scale:1;transition:opacity .8s var(--ease) var(--d,0ms),scale .9s cubic-bezier(.2,1.4,.3,1) var(--d,0ms)}
+.anim .sec.rv{translate:none}
+.anim .sec h3::before{scale:1 0;transition:scale .5s var(--ease) .15s}
+.anim .sec.in h3::before{scale:1 1}
+/* hover lift */
+.anim .card,.anim .steps li,.anim .stat,.anim .join,.anim .lead-card{transition:transform .25s var(--ease),box-shadow .25s,border-color .25s}
+.anim .card:hover,.anim .steps li:hover,.anim .stat:hover{transform:translateY(-4px);box-shadow:0 12px 28px -14px rgba(10,40,16,.45);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.anim .game::before{transition:width .3s var(--ease)}
+.anim .game:hover::before{width:9px}
+.anim .ms .card:hover{transform:translateX(4px)}
+/* buttons: press + light sweep */
+button,a.btn{transition:transform .15s var(--ease),background-color .2s,border-color .2s,color .2s}
+.anim button:active,.anim a.btn:active{transform:scale(.96)}
+.anim button.primary,.anim a.btn.primary{position:relative;overflow:hidden}
+.anim button.primary::after,.anim a.btn.primary::after{content:"";position:absolute;inset:-2px auto -2px 0;width:40%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-160%) skewX(-18deg);pointer-events:none}
+.anim button.primary:hover::after,.anim a.btn.primary:hover::after{transition:transform .7s var(--ease);transform:translateX(320%) skewX(-18deg)}
+.anim .hero .ctas a.btn.primary::after{animation:sweep 6s 2.2s infinite}
+@keyframes sweep{0%{transform:translateX(-160%) skewX(-18deg)}14%,100%{transform:translateX(320%) skewX(-18deg)}}
+.anim .chips button:hover,.anim .hero .ctas button:hover{transform:translateY(-2px)}
+/* hero: slow drift on the background, a scan line, and a crest that follows the cursor */
+.anim .hero canvas{animation:drift 26s ease-in-out infinite alternate;transform-origin:60% 50%}
+@keyframes drift{from{transform:scale(1.02) translate(0,0)}to{transform:scale(1.12) translate(-2.5%,1.5%)}}
+.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent 0,rgba(126,211,131,.10) 48%,rgba(126,211,131,.22) 50%,transparent 52%) 0 0/100% 260% no-repeat}
+.anim .hero::after{opacity:1;animation:scan 7s linear infinite}
+@keyframes scan{from{background-position:0 120%}to{background-position:0 -20%}}
+.hero-in img{transition:transform .5s var(--ease)}
+.anim .hero-in img{transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.anim .hero .eyebrow::after{content:"";display:inline-block;width:.55em;height:.9em;margin-left:6px;vertical-align:-.1em;background:#7ed383;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* progress segments fill one after another */
+.anim .bar.rv{opacity:1;translate:none}
+.anim .bar.rv i{transform:skewX(-18deg) scaleX(0);transform-origin:left;transition:transform .55s var(--ease)}
+.anim .bar.rv.in i{transform:skewX(-18deg) scaleX(1)}
+.bar i:nth-child(2){transition-delay:.12s!important}.bar i:nth-child(3){transition-delay:.24s!important}
+.bar i:nth-child(4){transition-delay:.36s!important}.bar i:nth-child(5){transition-delay:.48s!important}
+/* roadmap: the line draws down, dots pop, cards slide in */
+.anim .ms.rv{translate:none;opacity:1}
+.anim .ms.rv::before{transform:scaleY(0);transform-origin:top;transition:transform .6s var(--ease) calc(var(--d,0ms) + .25s)}
+.anim .ms.rv.in::before{transform:none}
+.anim .ms.rv .dot{scale:0;transition:scale .5s cubic-bezier(.2,1.5,.3,1) var(--d,0ms)}
+.anim .ms.rv.in .dot{scale:1}
+.anim .ms.rv .card{opacity:0;translate:30px 0;transition:opacity .6s var(--ease) calc(var(--d,0ms) + .1s),translate .6s var(--ease) calc(var(--d,0ms) + .1s),transform .25s var(--ease),box-shadow .25s,border-color .25s}
+.anim .ms.rv.in .card{opacity:1;translate:0 0}
+.anim .ms.next .dot::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--accent);animation:ping 2.2s var(--ease) infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(1.7);opacity:0}}
+.anim .ms.next .pill{border-color:var(--accent);color:var(--accent)}
 </style>
 
 <div class="wrap">
@@ -188,6 +253,7 @@ footer.site{color:var(--muted);font-size:13px;border-top:1px solid var(--line);p
     <button type="button" role="tab" data-top="home" aria-selected="true">Home</button>
     <button type="button" role="tab" data-top="roadmap" aria-selected="false">Roadmap</button>
     <button type="button" role="tab" data-top="kit" aria-selected="false">Graphics Kit</button>
+    <span class="ink" aria-hidden="true"></span>
   </nav>
 
   <section id="home" aria-label="Home" hidden>
@@ -1190,6 +1256,8 @@ function setMode(m){
   $("f").hidden = m !== "match"; $("f-league").hidden = m !== "league"; $("f-cup").hidden = m !== "cup"; $("f-f1").hidden = m !== "f1";
   $("status").textContent = "";
   draw();
+  const prev = window.__page; window.__page = page;
+  onPage(page, prev, m);
 }
 const go = k => setMode(k === "kit" ? lastTool : k);
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => go(b.dataset.top)));
@@ -1292,6 +1360,70 @@ $("copy").addEventListener("click", async () => {
     $("status").textContent = "Copying images isn't allowed here. Use Save PNG instead.";
   }
 });
+
+// ---------- motion ----------
+const motionOK = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) && "IntersectionObserver" in window;
+if (motionOK) document.documentElement.classList.add("anim");
+// Tag what should reveal, with a stagger inside each group.
+(function tagReveals(){
+  const tag = (els, step = 80, extra = "") => [...els].forEach((el, i) => { el.classList.add("rv"); if (extra) el.classList.add(extra); el.style.setProperty("--d", (i * step) + "ms"); });
+  tag(document.querySelectorAll(".hero-in > img"), 0, "pop");
+  tag(document.querySelectorAll(".hero-in > div > *"), 110);
+  tag(document.querySelectorAll(".stats .stat"), 110);
+  tag(document.querySelectorAll("#home .sec"), 0);
+  document.querySelectorAll("#home .sec").forEach(s => tag(s.querySelectorAll(":scope > p, .lead-card, .grid > .card, .regs > .card, .steps > li, .join, .kitcard"), 70));
+  tag(document.querySelectorAll(".rm-head > *, .progress"), 90);
+  tag(document.querySelectorAll(".bar"), 0);
+  tag(document.querySelectorAll(".timeline .ms"), 140);
+  const firstTodo = document.querySelector(".timeline .ms.todo"); firstTodo && firstTodo.classList.add("next");
+})();
+// Count the stat numbers up the first time they appear.
+function countUp(b){
+  if (b.dataset.done) return; b.dataset.done = 1;
+  const target = +b.textContent, t0 = performance.now(), dur = 1100;
+  const step = t => { const p = Math.min(1, (t - t0) / dur); b.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(step); };
+  b.textContent = "0"; requestAnimationFrame(step);
+}
+const revealIO = motionOK ? new IntersectionObserver(entries => entries.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("in"); revealIO.unobserve(e.target);
+  if (e.target.classList.contains("stat")) countUp(e.target.querySelector("b"));
+}), { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }) : null;
+// Replay a page's reveals each time it's opened.
+function replay(root){
+  if (!revealIO) return;
+  root.querySelectorAll(".rv").forEach(el => { el.classList.remove("in"); revealIO.unobserve(el); });
+  requestAnimationFrame(() => requestAnimationFrame(() => root.querySelectorAll(".rv").forEach(el => revealIO.observe(el))));
+}
+// Sliding underline under the selected top tab.
+function moveInk(){
+  const sel = document.querySelector('.tabs button[aria-selected="true"]'), ink = document.querySelector(".tabs .ink");
+  if (!sel || !ink) return;
+  ink.style.width = sel.offsetWidth + "px"; ink.style.transform = `translateX(${sel.offsetLeft}px)`;
+}
+addEventListener("resize", moveInk);
+document.fonts && document.fonts.ready.then(moveInk);
+function onPage(page, prev, m){
+  moveInk();
+  if (!motionOK) return;
+  if (page !== prev) {
+    const el = page === "kit" ? $("tool") : $(page);
+    el.animate([{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "none" }], { duration: 450, easing: "cubic-bezier(.2,.8,.2,1)" });
+    if (page !== "kit") replay(el);
+  } else if (page === "kit") {
+    $("out") && $("out").animate([{ opacity: .25, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 380, easing: "cubic-bezier(.2,.8,.2,1)" });
+  }
+}
+// The crest tilts gently toward the cursor.
+(function tilt(){
+  const hero = document.querySelector(".hero"), img = document.querySelector(".hero-in > img");
+  if (!motionOK || !hero || !img || !matchMedia("(pointer:fine)").matches) return;
+  hero.addEventListener("pointermove", e => {
+    const r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    img.style.setProperty("--ry", (x * 16).toFixed(2) + "deg"); img.style.setProperty("--rx", (-y * 12).toFixed(2) + "deg");
+  });
+  hero.addEventListener("pointerleave", () => { img.style.setProperty("--ry", "0deg"); img.style.setProperty("--rx", "0deg"); });
+})();
 
 ourImg.onload = draw;
 setMode("home");
